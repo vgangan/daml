@@ -1,7 +1,7 @@
 -- Copyright (c) 2019 The DAML Authors. All rights reserved.
 -- SPDX-License-Identifier: Apache-2.0
 
-module DA.Daml.LF.Speed.Main
+module HaskellSpeed
   ( main
   ) where
 
@@ -35,6 +35,6 @@ timedNfib arg = do
   return $ Stats { func, arg, res, duration, speed }
 
 nfib :: Int -> Int
-nfib 0 = 0
-nfib 1 = 0
+nfib 0 = 1
+nfib 1 = 1
 nfib n = nfib (n-1) + nfib (n-2) + 1

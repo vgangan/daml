@@ -56,9 +56,8 @@ da_haskell_test(
 )
 
 da_haskell_binary(
-    name = "exec",
-    srcs = glob(["exec/**/*.hs"]),
-    compiler_flags = [],
+    name = "Explore",
+    srcs = glob(["exec/Explore.hs"]),
     data = [
         ":examples.dar",
     ],
@@ -71,7 +70,7 @@ da_haskell_binary(
         "text",
         "zip-archive",
     ],
-    main_function = "DA.Daml.LF.Evaluator.Main.main",
+    main_function = "Explore.main",
     visibility = ["//visibility:public"],
     deps = [
         "//compiler/daml-lf-ast",
@@ -83,17 +82,14 @@ da_haskell_binary(
 )
 
 da_haskell_binary(
-    name = "speed",
-    srcs = glob(["speed/**/*.hs"]),
-    compiler_flags = [],
+    name = "HaskellSpeed",
+    srcs = glob(["exec/HaskellSpeed.hs"]),
     hackage_deps = [
         "base",
         "time",
     ],
-    main_function = "DA.Daml.LF.Speed.Main.main",
+    main_function = "HaskellSpeed.main",
     visibility = ["//visibility:public"],
-    deps = [
-    ],
 )
 
 da_haskell_repl(
@@ -102,8 +98,8 @@ da_haskell_repl(
     visibility = ["//visibility:public"],
     deps = [
         "//compiler/daml-lf-evaluator",
-        "//compiler/daml-lf-evaluator:exec",
-        "//compiler/daml-lf-evaluator:speed",
         "//compiler/daml-lf-evaluator:test",
+        "//compiler/daml-lf-evaluator:Explore",
+        "//compiler/daml-lf-evaluator:HaskellSpeed",
     ],
 )

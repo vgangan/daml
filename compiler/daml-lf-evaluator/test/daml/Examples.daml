@@ -92,3 +92,10 @@ myFoldl2 f b = \case
     let (x,xs) = pair in myFoldl2 f (f b x) xs
 
 run_sum_myList2 n = mySum2 (ofList2 (makeList3 n))
+
+-- nfib classic
+
+nfib : Int -> Int
+nfib 0 = 1
+nfib 1 = 1
+nfib n = nfib (n-1) + nfib (n-2) + 1
