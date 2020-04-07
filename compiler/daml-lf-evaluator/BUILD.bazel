@@ -82,6 +82,20 @@ da_haskell_binary(
     ],
 )
 
+da_haskell_binary(
+    name = "speed",
+    srcs = glob(["speed/**/*.hs"]),
+    compiler_flags = [],
+    hackage_deps = [
+        "base",
+        "time",
+    ],
+    main_function = "DA.Daml.LF.Speed.Main.main",
+    visibility = ["//visibility:public"],
+    deps = [
+    ],
+)
+
 da_haskell_repl(
     name = "repl",
     testonly = True,
@@ -89,6 +103,7 @@ da_haskell_repl(
     deps = [
         "//compiler/daml-lf-evaluator",
         "//compiler/daml-lf-evaluator:exec",
+        "//compiler/daml-lf-evaluator:speed",
         "//compiler/daml-lf-evaluator:test",
     ],
 )
