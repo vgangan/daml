@@ -65,7 +65,6 @@ da_haskell_binary(
         "base",
         "bytestring",
         "containers",
-        "extra",
         "filepath",
         "text",
         "zip-archive",
@@ -77,7 +76,6 @@ da_haskell_binary(
         "//compiler/daml-lf-evaluator",
         "//compiler/daml-lf-reader",
         "//libs-haskell/bazel-runfiles",
-        "//libs-haskell/da-hs-base",
     ],
 )
 
@@ -92,6 +90,31 @@ da_haskell_binary(
     visibility = ["//visibility:public"],
 )
 
+da_haskell_binary(
+    name = "MyIntSpeed",
+    srcs = glob(["exec/MyIntSpeed.hs"]),
+    data = [
+        ":examples.dar",
+    ],
+    hackage_deps = [
+        "base",
+        "time",
+        "bytestring",
+        "containers",
+        "filepath",
+        "text",
+        "zip-archive",
+    ],
+    main_function = "MyIntSpeed.main",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//compiler/daml-lf-ast",
+        "//compiler/daml-lf-evaluator",
+        "//compiler/daml-lf-reader",
+        "//libs-haskell/bazel-runfiles",
+    ],
+)
+
 da_haskell_repl(
     name = "repl",
     testonly = True,
@@ -101,5 +124,6 @@ da_haskell_repl(
         "//compiler/daml-lf-evaluator:test",
         "//compiler/daml-lf-evaluator:Explore",
         "//compiler/daml-lf-evaluator:HaskellSpeed",
+        "//compiler/daml-lf-evaluator:MyIntSpeed",
     ],
 )

@@ -9,7 +9,7 @@ import Data.Time (getCurrentTime,diffUTCTime)
 
 main :: IO ()
 main = do
-  putStrLn "nfib speed test"
+  putStrLn "nfib speed test (Haskell)"
   loop 30 -- initial argument
     where
       loop :: Int -> IO ()
@@ -19,6 +19,12 @@ main = do
         if elapsed > 0.5 then print info else do
           print info
           loop (arg+1)
+
+nfib :: Int -> Int
+nfib 0 = 1
+nfib 1 = 1
+nfib n = nfib (n-1) + nfib (n-2) + 1
+
 
 data Info = Info
   { arg :: Int
@@ -37,8 +43,3 @@ measure f arg = do
   let elapsed = realToFrac $ diffUTCTime after before
   let speed = fromIntegral res / elapsed
   return $ Info { arg, res, elapsed, speed }
-
-nfib :: Int -> Int
-nfib 0 = 1
-nfib 1 = 1
-nfib n = nfib (n-1) + nfib (n-2) + 1
