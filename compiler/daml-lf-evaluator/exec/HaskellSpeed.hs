@@ -9,30 +9,34 @@ import Data.Time (getCurrentTime,diffUTCTime)
 
 main :: IO ()
 main = do
-  putStrLn "speed nfib test"
-  mapM_ runTest args
-    where args = [30..40]
-          runTest arg = do stats <- timedNfib arg; print stats
+  putStrLn "nfib speed test"
+  loop 30 -- initial argument
+    where
+      loop :: Int -> IO ()
+      loop arg = do
+        -- keep incrementing the argument until the elapsed time > 0.5 second
+        info@Info{elapsed} <- measure nfib arg
+        if elapsed > 0.5 then print info else do
+          print info
+          loop (arg+1)
 
-data Stats = Stats
-  { func :: String
-  , arg :: Int
+data Info = Info
+  { arg :: Int
   , res :: Int
-  , duration :: Seconds
+  , elapsed :: Seconds
   , speed :: Speed } deriving Show
 
 type Seconds = Double
 type Speed = Double
 
-timedNfib :: Int -> IO Stats
-timedNfib arg = do
-  let func = "nfib"
+measure :: (Int -> Int) -> Int -> IO Info
+measure f arg = do
   before <- getCurrentTime
-  let !res = nfib arg
+  let !res = f arg
   after <- getCurrentTime
-  let duration = realToFrac $ diffUTCTime after before
-  let speed :: Speed = fromIntegral res / duration
-  return $ Stats { func, arg, res, duration, speed }
+  let elapsed = realToFrac $ diffUTCTime after before
+  let speed = fromIntegral res / elapsed
+  return $ Info { arg, res, elapsed, speed }
 
 nfib :: Int -> Int
 nfib 0 = 1
