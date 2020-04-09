@@ -1,4 +1,4 @@
--- Copyright (c) 2019 The DAML Authors. All rights reserved.
+-- Copyright (c) 2020 Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
 -- SPDX-License-Identifier: Apache-2.0
 
 module DA.Daml.LF.Evaluator.Pretty
@@ -58,6 +58,7 @@ ppExp = pp0
       Con tag elems -> unTag tag <> ppArgs (map pp0 elems)
       Match{scrut,alts} -> "case " <> pp0 scrut <> " of " <> intercalate "; " (map ppAlt alts)
       Ref i -> "#" <> show i
+      Located exp -> "[[" <> pp1 exp <> "]]"
 
     ppAlt :: Alt -> String
     ppAlt Alt{tag,bound,rhs} = unTag tag <> ppArgs (map ppVar bound) <> " -> " <> pp0 rhs
@@ -74,6 +75,7 @@ ppExp = pp0
       Var{} -> True
       Rec{} -> True
       Ref{} -> True
+      Located{} -> True
 
       App{} -> False
       Lam{} -> False
@@ -81,3 +83,4 @@ ppExp = pp0
       Dot{} -> False
       Con{} -> False
       Match{} -> False
+

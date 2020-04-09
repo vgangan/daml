@@ -1,4 +1,4 @@
--- Copyright (c) 2019 The DAML Authors. All rights reserved.
+-- Copyright (c) 2020 Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
 -- SPDX-License-Identifier: Apache-2.0
 
 {-# LANGUAGE GADTs #-}
@@ -73,6 +73,10 @@ eval = \case
     exp <- GetDef i
     eval exp
 
+  Exp.Located exp -> do
+    eval exp
+
+
 evalAlts :: Value -> [Alt] -> Effect Value
 evalAlts v = \case
   [] -> error "no alternatives match"
@@ -132,3 +136,4 @@ type Env = Map Exp.Var Value
 
 env0 :: Env
 env0 = Map.empty
+

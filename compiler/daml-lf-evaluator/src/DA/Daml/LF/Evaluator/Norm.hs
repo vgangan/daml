@@ -1,4 +1,4 @@
--- Copyright (c) 2019 The DAML Authors. All rights reserved.
+-- Copyright (c) 2020 Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
 -- SPDX-License-Identifier: Apache-2.0
 
 {-# LANGUAGE GADTs #-}
@@ -78,6 +78,10 @@ norm = \case
 
   Exp.Ref i ->
     Share i
+
+  Exp.Located exp -> do
+    exp <- norm exp >>= reify
+    return $ Syntax $ Exp.Located exp
 
 
 normAlt :: Alt -> Effect Alt
@@ -242,3 +246,5 @@ isDirectlyRecursive i = look where
     Exp.Con _ elems -> any look elems
     Exp.Match{scrut,alts} -> look scrut || any (\Exp.Alt{rhs} -> look rhs) alts
     Exp.Ref j -> (i==j)
+    Exp.Located exp -> look exp
+

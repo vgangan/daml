@@ -1,3 +1,6 @@
+# Copyright (c) 2020 Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
+# SPDX-License-Identifier: Apache-2.0
+
 # Copyright (c) 2019 The DAML Authors. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
@@ -19,6 +22,7 @@ da_haskell_library(
     deps = [
         "//compiler/daml-lf-ast",
         "//compiler/daml-lf-proto",
+        "//compiler/daml-lf-optimize",
         "//compiler/daml-lf-reader",
         "//libs-haskell/da-hs-base",
     ],
@@ -38,6 +42,7 @@ da_haskell_test(
     hackage_deps = [
         "base",
         "bytestring",
+        "containers",
         "tasty",
         "tasty-hunit",
         "text",
@@ -50,6 +55,7 @@ da_haskell_test(
     deps = [
         "//compiler/daml-lf-ast",
         "//compiler/daml-lf-evaluator",
+        "//compiler/daml-lf-optimize",
         "//compiler/daml-lf-reader",
         "//libs-haskell/bazel-runfiles",
     ],
@@ -74,6 +80,7 @@ da_haskell_binary(
     deps = [
         "//compiler/daml-lf-ast",
         "//compiler/daml-lf-evaluator",
+        "//compiler/daml-lf-optimize",
         "//compiler/daml-lf-reader",
         "//libs-haskell/bazel-runfiles",
     ],
@@ -125,5 +132,7 @@ da_haskell_repl(
         "//compiler/daml-lf-evaluator:Explore",
         "//compiler/daml-lf-evaluator:HaskellSpeed",
         "//compiler/daml-lf-evaluator:MyIntSpeed",
+        "//compiler/daml-lf-optimize",
     ],
 )
+

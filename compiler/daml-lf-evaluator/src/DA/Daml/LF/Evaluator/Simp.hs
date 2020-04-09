@@ -1,31 +1,25 @@
--- Copyright (c) 2019 The DAML Authors. All rights reserved.
+-- Copyright (c) 2020 Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
 -- SPDX-License-Identifier: Apache-2.0
 
 {-# LANGUAGE GADTs #-}
 
-module DA.Daml.LF.Evaluator.Simp
-  ( DecodedDar(..),
-    simplify,
-  ) where
+module DA.Daml.LF.Evaluator.Simp (simplify) where
 
 import Control.Monad (ap,liftM,forM)
-import DA.Daml.LF.Evaluator.Exp (Prog,Exp,Alt)
-import DA.Daml.LF.Evaluator.Value (Value)
 import Data.Map.Strict (Map)
-import qualified DA.Daml.LF.Ast as LF
-import qualified DA.Daml.LF.Evaluator.Exp as Exp
-import qualified DA.Daml.LF.Evaluator.Value as Value
 import qualified Data.Map.Strict as Map
 import qualified Data.NameMap as NM
 
-data DecodedDar = DecodedDar
-  { mainId :: LF.PackageId
-  , packageMap :: Map LF.PackageId LF.Package
-  }
+import DA.Daml.LF.Evaluator.Exp (Prog,Exp,Alt)
+import DA.Daml.LF.Evaluator.Value (Value)
+import DA.Daml.LF.Optimize (World(..))
+import qualified DA.Daml.LF.Ast as LF
+import qualified DA.Daml.LF.Evaluator.Exp as Exp
+import qualified DA.Daml.LF.Evaluator.Value as Value
 
-simplify :: DecodedDar -> LF.ModuleName -> LF.ExprValName -> Prog
-simplify ddar@DecodedDar{mainId} moduleName name = do
-  runEffect ddar $ do
+simplify :: World -> LF.ModuleName -> LF.ExprValName -> Prog
+simplify world@World{mainId} moduleName name = do
+  runEffect world $ do
     simpExprValName mainId moduleName name
 
 simpExprValName :: LF.PackageId -> LF.ModuleName -> LF.ExprValName -> Effect Exp
@@ -45,7 +39,7 @@ getModule pid moduleName = do
   package <- GetPackage pid
   let LF.Package{packageModules} = package
   case NM.lookup moduleName packageModules of
-    Nothing -> Fail $ "getModule, " <> show (pid,moduleName)
+    Nothing -> Fail $ "simp-getModule, " <> show (pid,moduleName)
     Just mod -> return mod
 
 simpExpr :: LF.Expr -> Effect Exp
@@ -132,7 +126,9 @@ simpExpr expr = case expr of
   LF.EUpdate{} -> todo "EUpdate"
   LF.EScenario{} -> todo "EScenario"
 
-  LF.ELocation _sl expr -> simpExpr expr
+  LF.ELocation _sl expr -> do
+    -- loose location info
+    simpExpr expr
 
   where todo s = Fail $ "todo: simpExpr(" <> s <> "), " <> show expr
 
@@ -209,8 +205,8 @@ data Effect a where
   Share :: Exp.DefKey -> Effect Exp -> Effect Int
 
 
-runEffect :: DecodedDar -> Effect Exp -> Prog
-runEffect DecodedDar{mainId,packageMap} e = do
+runEffect :: World -> Effect Exp -> Prog
+runEffect World{mainId,packageMap} e = do
   let state0 = (0,Map.empty)
   let (main,(_,m')) = run mainId state0 e
   let defs = foldr (\(name,(i,exp)) m -> Map.insert i (name,exp) m) Map.empty (Map.toList m')
@@ -219,7 +215,7 @@ runEffect DecodedDar{mainId,packageMap} e = do
   where
     run :: LF.PackageId -> State -> Effect a -> (a,State)
     run pid state = \case
-      Fail mes -> error $ "Fail, " <> mes
+      Fail mes -> error $ "Simp.Fail, " <> mes
       Ret x -> (x,state)
       Bind e f -> do
         let (v1,state1) = run pid state e
@@ -244,3 +240,4 @@ runEffect DecodedDar{mainId,packageMap} e = do
         Nothing -> error $ "getPackage, " <> show k
 
 type State = (Int, Map Exp.DefKey (Int,Exp))
+

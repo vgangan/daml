@@ -1,4 +1,4 @@
--- Copyright (c) 2019 The DAML Authors. All rights reserved.
+-- Copyright (c) 2020 Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
 -- SPDX-License-Identifier: Apache-2.0
 
 module MyIntSpeed
@@ -48,10 +48,10 @@ getNfib Conf{mode} = do
   let funcName = "nfib"
   filename <- locateRunfiles (mainWorkspace </> "compiler/daml-lf-evaluator/examples.dar")
   dalfs <- readDar filename
-  ddar <- EV.decodeDalfs dalfs
+  world <- EV.decodeDalfs dalfs
   let mn = LF.ModuleName ["Examples"]
   let vn = LF.ExprValName $ Text.pack funcName
-  let !prog0 = simplify ddar mn vn
+  let !prog0 = simplify world mn vn
   prog <-
     case mode of
       Original -> return prog0
@@ -85,3 +85,4 @@ measure f arg = do
   let elapsed = realToFrac $ diffUTCTime after before
   let speed = fromIntegral res / elapsed
   return $ Info { arg, res, elapsed, speed }
+

@@ -1,4 +1,4 @@
--- Copyright (c) 2019 The DAML Authors. All rights reserved.
+-- Copyright (c) 2020 Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
 -- SPDX-License-Identifier: Apache-2.0
 
 module DA.Daml.LF.Evaluator.Exp
@@ -20,6 +20,7 @@ data Exp
   | Con Tag [Exp]
   | Match { scrut :: Exp, alts :: [Alt] }
   | Ref Int
+  | Located Exp
   deriving (Show)
 
 type Var = LF.ExprVarName
@@ -34,3 +35,4 @@ type Defs = Map Int (DefKey,Exp)
 
 newtype DefKey = DefKey (LF.PackageId, LF.ModuleName, LF.ExprValName)
   deriving (Eq,Ord,Show)
+

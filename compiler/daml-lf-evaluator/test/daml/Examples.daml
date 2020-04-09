@@ -1,3 +1,6 @@
+-- Copyright (c) 2020 Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
+-- SPDX-License-Identifier: Apache-2.0
+
 -- Copyright (c) 2019 The DAML Authors. All rights reserved.
 -- SPDX-License-Identifier: Apache-2.0
 
@@ -99,3 +102,4 @@ nfib : Int -> Int
 nfib 0 = 1
 nfib 1 = 1
 nfib n = nfib (n-1) + nfib (n-2) + 1
+

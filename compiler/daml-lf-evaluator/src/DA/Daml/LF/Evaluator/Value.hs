@@ -1,4 +1,4 @@
--- Copyright (c) 2019 The DAML Authors. All rights reserved.
+-- Copyright (c) 2020 Digital Asset (Switzerland) GmbH and/or its affiliates. All rights reserved.
 -- SPDX-License-Identifier: Apache-2.0
 
 {-# LANGUAGE GADTs #-}
@@ -198,3 +198,4 @@ incPrim x@Counts{prims} = x { prims = prims + 1 }
 
 incProjection :: Counts -> Counts
 incProjection x@Counts{projections} = x { projections = projections + 1 }
+
