@@ -1179,7 +1179,7 @@ abstract class AbstractHttpServiceIntegrationTest
     }: Future[Assertion]
   }
 
-  "query by a variant field" in withHttpService { (uri, encoder, decoder) =>
+  "query by a variant field" in withHttpService { (uri, encoder, _) =>
     val owner = domain.Party("Alice")
     val accountNumber = "abc123"
     val now = TimestampConversion.instantToMicros(Instant.now)
@@ -1216,5 +1216,19 @@ abstract class AbstractHttpServiceIntegrationTest
             }
         }
     }: Future[Assertion]
+  }
+
+  "packages endpoint should return all known packages" in withHttpServiceAndClient {
+    (uri, _, _, _) =>
+      getRequest(uri = uri.withPath(Uri.Path("/v1/packages"))).flatMap {
+        case (status, output) =>
+          status shouldBe StatusCodes.OK
+          inside(
+            decode1[domain.OkResponse, List[admin.PackageDetails]](output)
+          ) {
+            case \/-(domain.OkResponse(ps, None, StatusCodes.OK)) if ps.nonEmpty =>
+              Inspectors.forAll(ps)(_.packageId.length should be > 0)
+          }
+      }: Future[Assertion]
   }
 }
