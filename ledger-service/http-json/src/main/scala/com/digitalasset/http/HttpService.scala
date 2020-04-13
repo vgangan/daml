@@ -131,6 +131,11 @@ object HttpService extends StrictLogging {
         LedgerClientJwt.allocateParty(client)
       )
 
+      packageManagementService = new PackageManagementService(
+        LedgerClientJwt.listKnownPackages(client),
+        LedgerClientJwt.uploadDar(client)
+      )
+
       (encoder, decoder) = buildJsonCodecs(ledgerId, packageService)
 
       jsonEndpoints = new Endpoints(
@@ -139,6 +144,7 @@ object HttpService extends StrictLogging {
         commandService,
         contractsService,
         partiesService,
+        packageManagementService,
         encoder,
         decoder,
       )

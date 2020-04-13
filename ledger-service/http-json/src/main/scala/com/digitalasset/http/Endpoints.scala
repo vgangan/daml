@@ -40,6 +40,7 @@ class Endpoints(
     commandService: CommandService,
     contractsService: ContractsService,
     partiesService: PartiesService,
+    packageManagementService: PackageManagementService,
     encoder: DomainJsonEncoder,
     decoder: DomainJsonDecoder,
     maxTimeToCollectRequest: FiniteDuration = FiniteDuration(5, "seconds"))(
@@ -64,6 +65,7 @@ class Endpoints(
     case req @ HttpRequest(POST, Uri.Path("/v1/parties"), _, _, _) => httpResponse(parties(req))
     case req @ HttpRequest(POST, Uri.Path("/v1/parties/allocate"), _, _, _) =>
       httpResponse(allocateParty(req))
+    case req @ HttpRequest(GET, Uri.Path("/v1/packages"), _, _, _) => httpResponse(allPackages(req))
   }
 
   def create(req: HttpRequest): ET[domain.SyncResponse[JsValue]] =
@@ -187,13 +189,8 @@ class Endpoints(
       }
     }
 
-  def allParties(req: HttpRequest): ET[domain.SyncResponse[JsValue]] =
-    for {
-      t3 <- eitherT(input(req)): ET[(Jwt, JwtPayload, String)]
-      ps <- rightT(partiesService.allParties(t3._1)): ET[List[domain.PartyDetails]]
-      resp = domain.OkResponse(ps, None)
-      result <- either(resp.traverse(toJsValue(_)))
-    } yield result
+  def allParties(req: HttpRequest): ET[domain.SyncResponse[List[domain.PartyDetails]]] =
+    proxy(partiesService.allParties)(req)
 
   def parties(req: HttpRequest): ET[domain.SyncResponse[JsValue]] =
     for {
@@ -235,6 +232,9 @@ class Endpoints(
       jsVal <- either(SprayJson.encode(allocatedParty).liftErr(ServerError)): ET[JsValue]
 
     } yield domain.OkResponse(jsVal)
+
+  def allPackages(req: HttpRequest): ET[domain.SyncResponse[Seq[admin.PackageDetails]]] =
+    proxy(packageManagementService.listKnownPackages)(req)
 
   private def handleFutureEitherFailure[B](fa: Future[Error \/ B]): Future[Error \/ B] =
     fa.recover {
@@ -355,6 +355,12 @@ class Endpoints(
           case a @ \/-((_, _)) => \/-(a)
         }
       }
+
+  private def proxy[A](fn: Jwt => Future[A])(req: HttpRequest): ET[domain.SyncResponse[A]] =
+    for {
+      t3 <- eitherT(input(req)): ET[(Jwt, _, _)]
+      as <- rightT(fn(t3._1)): ET[A]
+    } yield domain.OkResponse(as, None)
 }
 
 object Endpoints {

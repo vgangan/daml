@@ -8,7 +8,6 @@ import akka.stream.scaladsl.Source
 import com.daml.jwt.domain.Jwt
 import com.daml.ledger.api
 import com.daml.ledger.api.v1.active_contracts_service.GetActiveContractsResponse
-import com.daml.ledger.api.v1.admin
 import com.daml.ledger.api.v1.command_service.{
   SubmitAndWaitForTransactionResponse,
   SubmitAndWaitForTransactionTreeResponse,
@@ -51,7 +50,7 @@ object LedgerClientJwt {
     (Jwt, Option[Ref.Party], Option[String]) => Future[api.domain.PartyDetails]
 
   type ListKnownPackages =
-    Jwt => Future[Seq[admin.package_management_service.PackageDetails]]
+    Jwt => Future[Seq[api.v1.admin.package_management_service.PackageDetails]]
 
   type UploadDarFile =
     (Jwt, protobuf.ByteString) => Future[Unit]
